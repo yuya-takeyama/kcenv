@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Summary: Display the directory where kubectl exists
+# Usage: kcenv bin-path
+#
+# Displays the directory where kubectl is installed.
+
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+remove_from_path() {
+  local path_to_remove="$1"
+  local path_before
+  local result=":${PATH//\~/$HOME}:"
+  while [ "$path_before" != "$result" ]; do
+    path_before="$result"
+    result="${result//:$path_to_remove:/:}"
+  done
+  result="${result%:}"
+  echo "${result#:}"
+}
+
+if [ -n "$1" ]; then
+  export KCENV_VERSION="$1"
+elif [ -z "$KCENV_VERSION" ]; then
+  KCENV_VERSION="$(kcenv-version-name)"
+fi
+
+if [ "$KCENV_VERSION" = "system" ]; then
+  SYSTEM_KUBECTL_PATH=$(PATH="$(remove_from_path "${KCENV_ROOT}/bin")" command -v kubectl)
+  if KUBECTL_BIN_PATH="${SYSTEM_KUBECTL_PATH}"; then
+    KUBECTL_BIN_PATH="${SYSTEM_KUBECTL_PATH%/*}"
+    echo "${KUBECTL_BIN_PATH:-/}"
+    exit
+  else
+    echo "kcenv: system version not found in PATH" >&2
+    exit 1
+  fi
+fi
+
+KCENV_BIN_PATH="${KCENV_ROOT}/versions/${KCENV_VERSION}"
+if [ ! -d "$KCENV_BIN_PATH" ]; then
+  echo "kcenv: version \`${KCENV_VERSION}' not installed" >&2
+  exit 1
+fi
+
+echo "$KCENV_BIN_PATH"

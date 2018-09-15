@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Usage: kcenv version-file [<dir>]
+# Summary: Detect the file that sets the current kcenv version
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+target_dir="$1"
+
+find_local_version_file() {
+  local root="$1"
+  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
+    if [ -s "${root}/.kubectl-version" ]; then
+      echo "${root}/.kubectl-version"
+      return 0
+    fi
+    [ -n "$root" ] || break
+    root="${root%/*}"
+  done
+  return 1
+}
+
+if [ -n "$target_dir" ]; then
+  find_local_version_file "$target_dir"
+else
+  find_local_version_file "$KCENV_DIR" || {
+    [ "$KCENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
+  } || echo "${KCENV_ROOT}/version"
+fi

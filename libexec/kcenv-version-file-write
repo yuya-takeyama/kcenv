@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Usage: kcenv version-file-write <file> <version>
+
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+KCENV_VERSION_FILE="$1"
+KCENV_VERSION="$2"
+
+if [ -z "$KCENV_VERSION" ] || [ -z "$KCENV_VERSION_FILE" ]; then
+  kcenv-help --usage version-file-write >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+kcenv-bin-path "$KCENV_VERSION" > /dev/null
+
+# Write the version out to disk.
+echo "$KCENV_VERSION" > "$KCENV_VERSION_FILE"

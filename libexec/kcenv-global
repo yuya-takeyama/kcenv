@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the global kubectl version
+#
+# Usage: kcenv global <version>
+#
+# Sets the global kubectl version. You can override the global version at
+# any time by setting a directory-specific version with `kcenv local'
+# or by setting the `KCENV_VERSION' environment variable.
+#
+# <version> should be a string matching a kubectl version known to kcenv.
+# The special version string `system' will use your default system kubectl.
+# Run `kcenv versions' for a list of available kubectl versions.
+
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+# Provide kcenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec kcenv-versions --bare
+fi
+
+KCENV_VERSION="$1"
+KCENV_VERSION_FILE="${KCENV_ROOT}/version"
+
+if [ -n "$KCENV_VERSION" ]; then
+  kcenv-version-file-write "$KCENV_VERSION_FILE" "$KCENV_VERSION"
+else
+  kcenv-version-file-read "$KCENV_VERSION_FILE" || echo system
+fi

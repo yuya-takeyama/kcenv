@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Usage: kcenv install <version>
+# Summary: Install the specified version of kubectl
+
+[ -n "${KCENV_DEBUG}" ] && set -x
+source ${KCENV_ROOT}/libexec/helpers.sh
+
+[ "${#}" -gt 1 ] && error_and_die "usage: kcenv install [<version>]"
+
+declare version regex
+
+if [ -z "${1}" ]; then
+  version_file="$(kcenv-version-file)"
+  if [ "${version_file}" != "${KCENV_ROOT}/version" ]; then
+    version="$(cat ${version_file} || true)"
+  fi
+else
+  version="${1}"
+fi
+
+dst_path="${KCENV_ROOT}/versions/${version}"
+if [ -f "${dst_path}/kubectl" ]; then
+  echo "kubectl v${version} is already installed"
+  exit 0
+fi
+
+KCENV_ARCH=${KCENV_ARCH:-amd64}
+case "$(uname -s)" in
+  Darwin*)
+    os="darwin/${KCENV_ARCH}"
+    ;;
+  MINGW64*)
+    os="windows/${KCENV_ARCH}"
+    ;;
+  MSYS_NT*)
+    os="windows/${KCENV_ARCH}"
+    ;;
+  CYGWIN_NT*)
+    os="windows/${KCENV_ARCH}"
+    ;;
+  *)
+    os="linux/${KCENV_ARCH}"
+    ;;
+esac
+
+kubectl_url="https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/${os}/kubectl"
+
+info "Installing kubectl v${version}"
+mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
+curl -f "${kubectl_url}" -o "${dst_path}/kubectl" || error_and_die "Download failed"
+chmod +x "${dst_path}/kubectl"
+
+info "Installation of kubectl v${version} successful"

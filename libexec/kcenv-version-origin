@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Summary: Explain how the current kubectl version is set
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+unset KCENV_VERSION_ORIGIN
+
+if [ -n "$KCENV_VERSION_ORIGIN" ]; then
+  echo "$KCENV_VERSION_ORIGIN"
+elif [ -n "$KCENV_VERSION" ]; then
+  echo "KCENV_VERSION environment variable"
+else
+  kcenv-version-file
+fi

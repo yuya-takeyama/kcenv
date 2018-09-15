@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Summary: Show the current kubectl version
+set -e
+[ -n "$KCENV_DEBUG" ] && set -x
+
+if [ -z "$KCENV_VERSION" ]; then
+  KCENV_VERSION_FILE="$(kcenv-version-file)"
+  KCENV_VERSION="$(kcenv-version-file-read "$KCENV_VERSION_FILE" || true)"
+fi
+
+if [ -z "$KCENV_VERSION" ] || [ "$KCENV_VERSION" = "system" ]; then
+  echo "system"
+  exit
+fi
+
+version_exists() {
+  local version="$1"
+  [ -d "${KCENV_ROOT}/versions/${version}" ]
+}
+
+if version_exists "$KCENV_VERSION"; then
+  echo "$KCENV_VERSION"
+elif version_exists "${KCENV_VERSION#kubectl-}"; then
+  echo "${KCENV_VERSION#kubectl-}"
+else
+  echo "kcenv: version \`$KCENV_VERSION' is not installed (set by $(kcenv-version-origin))" >&2
+  exit 1
+fi

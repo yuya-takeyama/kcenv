@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -e
+
+if [ "$1" = "--debug" ]; then
+  export KCENV_DEBUG=1
+  shift
+fi
+
+if [ -n "$KCENV_DEBUG" ]; then
+  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
+  set -x
+fi
+
+abort() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "kcenv: $*"
+    fi
+  } >&2
+  exit 1
+}
+
+READLINK=$(type -p greadlink readlink | head -1)
+[ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
+
+resolve_link() {
+  $READLINK "$1"
+}
+
+abs_dirname() {
+  local cwd="$PWD"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+if [ -z "${KCENV_ROOT}" ]; then
+  KCENV_ROOT="${HOME}/.kcenv"
+else
+  KCENV_ROOT="${KCENV_ROOT%/}"
+fi
+export KCENV_ROOT
+
+if [ -z "${KCENV_DIR}" ]; then
+  KCENV_DIR="$PWD"
+else
+  [[ $KCENV_DIR == /* ]] || KCENV_DIR="$PWD/$KCENV_DIR"
+  cd "$KCENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$KCENV_DIR'"
+  KCENV_DIR="$PWD"
+  cd "$OLDPWD"
+fi
+export KCENV_DIR
+
+
+shopt -s nullglob
+
+bin_path="$(abs_dirname "$0")"
+export PATH="${bin_path}:${PATH}"
+
+shopt -u nullglob
+
+command="$1"
+case "$command" in
+"" )
+  { kcenv---version
+    kcenv-help
+  } | abort
+  ;;
+-v | --version )
+  exec kcenv---version
+  ;;
+-h | --help )
+  exec kcenv-help
+  ;;
+* )
+  command_path="$(command -v "kcenv-$command" || true)"
+  if [ -z "$command_path" ]; then
+    if [ "$command" == "shell" ]; then
+      abort "shell integration not enabled. Run \`kcenv init' for instructions."
+    else
+      abort "no such command \`$command'"
+    fi
+  fi
+
+  shift 1
+  if [ "$1" = --help ]; then
+    if [[ "$command" == "sh-"* ]]; then
+      echo "kcenv help \"$command\""
+    else
+      exec kcenv-help "$command"
+    fi
+  else
+    exec "$command_path" "$@"
+  fi
+  ;;
+esac

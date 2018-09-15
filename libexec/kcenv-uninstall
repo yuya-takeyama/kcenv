@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Usage: kcenv uninstall <version>
+# Summary: Uninstall the specified version of kubectl
+
+[ -n "${KCENV_DEBUG}" ] && set -x
+source ${KCENV_ROOT}/libexec/helpers.sh
+
+[ ${#} -gt 1 ] && error_and_die "usage: kcenv uninstall [<version>]"
+
+declare version
+
+if [ -z "${1}" ]; then
+  version_file="$(kcenv-version-file)"
+  if [ "${version_file}" != "${KCENV_ROOT}/version" ];then
+    version="$(cat ${version_file} || true)"
+  fi
+else
+  version="${1}"
+fi
+
+[ -n "${version}" ] || error_and_die "Version is not specified"
+
+dst_path="${KCENV_ROOT}/versions/${version}"
+if [ -f "${dst_path}/kubectl" ]; then 
+  info "Uninstall kubectl v${version}"
+  rm -r "${dst_path}"
+  info "\033[0;32mkubectl v${version} is successfully uninstalled\033[0;39m"
+fi
