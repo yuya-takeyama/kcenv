@@ -18,13 +18,11 @@ set -e
 
 export KUBECTL_BIN_PATH=$(kcenv-bin-path)
 if [ -z "${KUBECTL_BIN_PATH}" ]; then
-  echo "kcenv: kubectl is not installed" >&2
   exit 1
 fi
 
 export KUBECTL="${KUBECTL_BIN_PATH}/kubectl"
 if [ ! -x "${KUBECTL}" ]; then
-  echo "kcenv: kubectl is not executable: ${KUBECTL}" >&2
   exit 1
 fi
 
