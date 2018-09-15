@@ -6,15 +6,6 @@ if [ -z "$KCENV_TEST_DIR" ]; then
   KCENV_TEST_DIR="${BATS_TMPDIR}/kcenv"
   export KCENV_TEST_DIR="$(mktemp -d "${KCENV_TEST_DIR}.XXX" 2>/dev/null || echo "$KCENV_TEST_DIR")"
 
-  if enable -f "${BATS_TEST_DIRNAME}"/../libexec/kcenv-realpath.dylib realpath 2>/dev/null; then
-    export KCENV_TEST_DIR="$(realpath "$KCENV_TEST_DIR")"
-  else
-    if [ -n "$KCENV_NATIVE_EXT" ]; then
-      echo "kcenv: failed to load \`realpath' builtin" >&2
-      exit 1
-    fi
-  fi
-
   export KCENV_ROOT="${KCENV_TEST_DIR}/root"
   export HOME="${KCENV_TEST_DIR}/home"
   export KCENV_HOOK_PATH="${KCENV_ROOT}/kcenv.d"
