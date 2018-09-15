@@ -7,7 +7,7 @@ source ${KCENV_ROOT}/libexec/helpers.sh
 
 [ "${#}" -gt 1 ] && error_and_die "usage: kcenv install [<version>]"
 
-declare version regex
+declare version
 
 if [ -z "${1}" ]; then
   version_file="$(kcenv-version-file)"
