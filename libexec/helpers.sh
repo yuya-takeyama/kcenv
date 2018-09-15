@@ -1,5 +1,5 @@
 function error_and_die() {
-  echo -e "tfenv: $(basename ${0}): \033[0;31m[ERROR] ${1}\033[0;39m" >&2
+  echo -e "kcenv: $(basename ${0}): \033[0;31m[ERROR] ${1}\033[0;39m" >&2
   exit 1
 }
 
