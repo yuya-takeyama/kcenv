@@ -22,7 +22,7 @@ setup() {
 }
 
 @test "writes value to arbitrary file" {
-  mkdir -p "${KCENV_ROOT}/versions/1.10.8"
+  mkdir -p "${KCENV_ROOT}/versions/1.10.8/bin"
   assert [ ! -e "my-version" ]
   run kcenv-version-file-write "${PWD}/my-version" "1.10.8"
   assert_success ""

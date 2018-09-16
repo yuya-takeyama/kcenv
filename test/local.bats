@@ -35,7 +35,7 @@ setup() {
 }
 
 @test "sets local version" {
-  mkdir -p "${KCENV_ROOT}/versions/1.2.3"
+  mkdir -p "${KCENV_ROOT}/versions/1.2.3/bin"
   run kcenv-local 1.2.3
   assert_success ""
   assert [ "$(cat .kubectl-version)" = "1.2.3" ]
@@ -43,7 +43,7 @@ setup() {
 
 @test "changes local version" {
   echo "1.0-pre" > .kubectl-version
-  mkdir -p "${KCENV_ROOT}/versions/1.2.3"
+  mkdir -p "${KCENV_ROOT}/versions/1.2.3/bin"
   run kcenv-local
   assert_success "1.0-pre"
   run kcenv-local 1.2.3

@@ -37,7 +37,7 @@ if [ "$KCENV_VERSION" = "system" ]; then
   fi
 fi
 
-KCENV_BIN_PATH="${KCENV_ROOT}/versions/${KCENV_VERSION}"
+KCENV_BIN_PATH="${KCENV_ROOT}/versions/${KCENV_VERSION}/bin"
 if [ ! -d "$KCENV_BIN_PATH" ]; then
   echo "kcenv: version \`${KCENV_VERSION}' is not installed" >&2
   exit 1

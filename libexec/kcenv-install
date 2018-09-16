@@ -18,7 +18,7 @@ else
   version="${1}"
 fi
 
-dst_path="${KCENV_ROOT}/versions/${version}"
+dst_path="${KCENV_ROOT}/versions/${version}/bin"
 if [ -f "${dst_path}/kubectl" ]; then
   echo "kubectl v${version} is already installed"
   exit 0
