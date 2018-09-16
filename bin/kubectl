@@ -2,4 +2,4 @@
 set -e
 [ -n "$KCENV_DEBUG" ] && set -x
 
-exec "$(dirname `which $0`)/../bin/kcenv" exec "$@"
+exec "$(dirname `which $0`)/../bin/kcenv" exec kubectl "$@"
