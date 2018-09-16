@@ -2,28 +2,36 @@
 #
 # Summary: Run kubectl with the selected version
 #
-# Usage: kcenv exec [arg1 arg2...]
+# Usage: kcenv exec <command> [arg1 arg2...]
 #
 # Runs kubectl by first preparing PATH so that the selected
 # version's `bin' directory is at the front.
 #
 # For example, if the currently selected kubectl version is 1.11.3:
-#   kcenv exec version
+#   kcenv exec kubectl version
 #
 # is equivalent to:
-#   PATH="$KCENV_ROOT/versions/1.11.3:$PATH" kubectl version
+#   PATH="$KCENV_ROOT/versions/1.11.3/bin:$PATH" kubectl version
 
 set -e
 [ -n "${KCENV_DEBUG}" ] && set -x
 
-export KUBECTL_BIN_PATH=$(kcenv-bin-path)
-if [ -z "${KUBECTL_BIN_PATH}" ]; then
+export CMD=$1
+if [ -z "${CMD}" ]; then
+  echo "kcenv: command is not specified" >&2
   exit 1
 fi
 
-export KUBECTL="${KUBECTL_BIN_PATH}/kubectl"
-if [ ! -x "${KUBECTL}" ]; then
+shift
+
+export BIN_PATH=$(kcenv-bin-path)
+if [ -z "${BIN_PATH}" ]; then
   exit 1
 fi
 
-exec "${KUBECTL}" "${@}"
+export CMD_FULL="${BIN_PATH}/${CMD}"
+if [ ! -x "${CMD_FULL}" ]; then
+  exit 1
+fi
+
+exec "${CMD_FULL}" "${@}"
