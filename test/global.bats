@@ -17,7 +17,7 @@ load test_helper
 }
 
 @test "set KCENV_ROOT/version" {
-  mkdir -p "$KCENV_ROOT/versions/1.2.3"
+  mkdir -p "$KCENV_ROOT/versions/1.2.3/bin"
   run kcenv-global "1.2.3"
   assert_success
   run kcenv-global
